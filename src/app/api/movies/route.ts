@@ -26,10 +26,13 @@ export async function GET() {
       data: movies,
       time: new Date().toISOString(),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("数据库查询错误:", error);
     return NextResponse.json(
-      { message: "获取电影列表失败", error: error.message },
+      {
+        message: "获取电影列表失败",
+        error: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

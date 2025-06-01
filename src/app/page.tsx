@@ -1,14 +1,24 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { connectMongo } from "@/lib/mongoose";
+import mongoose from "mongoose";
+
+const MovieSchema = new mongoose.Schema(
+  {},
+  { collection: "movies", strict: false }
+);
+const Movie = mongoose.models.Movie || mongoose.model("Movie", MovieSchema);
+
+interface IMovie {
+  _id: string;
+  title: string;
+}
 
 export default async function Home() {
-  const res = await fetch("http://localhost:3000/api/movies");
-  const data = await res.json();
-  console.log("接口返回数据：", data); // 服务端控制台输出
+  await connectMongo();
+  const movies = (await Movie.find({}).limit(10).lean()) as unknown as IMovie[];
 
   return (
     <ul>
-      {data.data.map((item: any) => (
+      {movies.map((item) => (
         <li key={item._id}>{item.title}</li>
       ))}
     </ul>
